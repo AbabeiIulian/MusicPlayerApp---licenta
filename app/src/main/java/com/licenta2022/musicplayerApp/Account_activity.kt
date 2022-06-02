@@ -1,12 +1,16 @@
 package com.licenta2022.musicplayerApp
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
+import com.licenta2022.musicplayerApp.other.Constants
+import com.licenta2022.musicplayerApp.other.Constants.ANDROID_TAG
 import com.licenta2022.musicplayerApp.other.Constants.NEW_USER
 import com.licenta2022.musicplayerApp.ui.MainActivity
 import kotlinx.android.synthetic.main.activity_account.*
@@ -18,8 +22,9 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 class Account_activity : AppCompatActivity() {
-    
 
+    private val firestore = FirebaseFirestore.getInstance()
+    private val usersCollection = firestore.collection(Constants.DB_USERS)
 
     lateinit var auth: FirebaseAuth
 
@@ -42,7 +47,9 @@ class Account_activity : AppCompatActivity() {
         }
 
         imageButtonDone.setOnClickListener{
-            updateProfile()
+            if (editUsername.text.toString().isNotEmpty()) {
+                updateProfile()
+            }
             editUsername.isVisible = false
             imageButtonDone.isVisible = false
             editUsername.text = null
@@ -64,14 +71,20 @@ class Account_activity : AppCompatActivity() {
     private fun checkState(){
 
         val user = auth.currentUser
-        if (NEW_USER == false) {
+
             if (user?.displayName.toString().isNotEmpty()) {
                 username.setText(user?.displayName)
+            } else{
+                username.setText(auth.currentUser?.email)
             }
-        }else{
+
+        if (NEW_USER) {
             username.setText(auth.currentUser?.email)
             NEW_USER = false
         }
+
+
+        isPremium()
 
     }
 
@@ -104,6 +117,37 @@ class Account_activity : AppCompatActivity() {
             }
 
         }
+    }
+
+
+    private fun isPremium(){
+
+        val docRef = usersCollection.document(auth.currentUser?.uid.toString())
+        docRef.get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    Log.d(ANDROID_TAG, "DocumentSnapshot data: ${document.data?.get("premium")}")
+
+                    val premiumCheck = document.data?.get("premium")
+
+                    if (premiumCheck == true){
+                        premiumButton.setBackgroundResource(R.drawable.ic_checked)
+                        premiumTextcheck.text= "Premium"
+                    }else{
+                        premiumButton.setBackgroundResource(R.drawable.ic_unchecked)
+                        premiumTextcheck.text= "Buy premium"
+                    }
+
+
+                } else {
+                    Log.d(ANDROID_TAG, "No such document")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d(ANDROID_TAG, "get failed with ", exception)
+            }
+
+
     }
 
 }
