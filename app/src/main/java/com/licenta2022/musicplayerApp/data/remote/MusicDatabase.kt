@@ -8,11 +8,14 @@ import kotlinx.coroutines.tasks.await
 class MusicDatabase {
 
     private val firestore = FirebaseFirestore.getInstance()
-    private val songCollection = firestore.collection(SONG_COLLECTION)
 
-    suspend fun getAllSongs(): List<Song>{
+
+    //private val songCollection = firestore.collection("/playlists/Playlist1/Songs_in_playlist1")
+
+    suspend fun getSongsByPlaylist(): List<Song>{
         return try{
-            songCollection.get().await().toObjects(Song::class.java)
+            //firestore.collection("/playlists/${playlistId}/Songs_in_playlist1").get().await().toObjects(Song::class.java)
+            firestore.collection(SONG_COLLECTION).get().await().toObjects(Song::class.java)
         }catch (e: Exception)
         {
             emptyList()

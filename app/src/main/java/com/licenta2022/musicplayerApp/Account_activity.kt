@@ -66,7 +66,12 @@ class Account_activity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        playlistButton.setOnClickListener {
+            val intent = Intent(this, Playlist_activity::class.java)
+            startActivity(intent) }
+
     }
+
 
     private fun checkState(){
 

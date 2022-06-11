@@ -25,7 +25,7 @@ class FirebaseMusicSource @Inject constructor(
     suspend fun fetchMediaData() = withContext(Dispatchers.IO){
         state = STATE_INITIALIZING
 
-        val allSongs = musicDatabase.getAllSongs()
+        val allSongs = musicDatabase.getSongsByPlaylist()
         songs = allSongs.map { song ->
             MediaMetadataCompat.Builder()
                 .putString(METADATA_KEY_ARTIST, song.subtitle)
@@ -37,6 +37,7 @@ class FirebaseMusicSource @Inject constructor(
                 .putString(METADATA_KEY_ALBUM_ART_URI, song.imageUrl)
                 .putString(METADATA_KEY_DISPLAY_SUBTITLE, song.subtitle)
                 .putString(METADATA_KEY_DISPLAY_DESCRIPTION, song.subtitle)
+                .putString(METADATA_KEY_GENRE, song.songGenre)
                 .build()
         }
         state = STATE_INITIALIZED

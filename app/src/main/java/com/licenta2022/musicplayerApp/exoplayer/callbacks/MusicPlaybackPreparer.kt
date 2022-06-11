@@ -1,6 +1,5 @@
 package com.licenta2022.musicplayerApp.exoplayer.callbacks
 
-import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.Bundle
 import android.os.ResultReceiver

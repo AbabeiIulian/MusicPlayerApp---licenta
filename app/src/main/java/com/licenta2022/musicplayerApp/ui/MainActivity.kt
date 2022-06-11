@@ -1,5 +1,6 @@
 package com.licenta2022.musicplayerApp.ui
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -7,6 +8,10 @@ import android.provider.AlarmClock.EXTRA_MESSAGE
 import android.support.v4.media.session.PlaybackStateCompat
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.Button
+import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
@@ -15,6 +20,7 @@ import com.bumptech.glide.RequestManager
 import com.google.android.material.snackbar.Snackbar
 import com.licenta2022.musicplayerApp.Account_activity
 import com.licenta2022.musicplayerApp.Loggin_activity
+import com.licenta2022.musicplayerApp.Playlist_activity
 import com.licenta2022.musicplayerApp.R
 import com.licenta2022.musicplayerApp.adapters.SwipeSongAdapter
 import com.licenta2022.musicplayerApp.data.entities.Song
@@ -25,6 +31,7 @@ import com.licenta2022.musicplayerApp.other.Status.*
 import com.licenta2022.musicplayerApp.ui.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.list_item.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -41,6 +48,8 @@ class MainActivity : AppCompatActivity() {
     private var curPlayingSong: Song? = null
 
     private var playbackState: PlaybackStateCompat? = null
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,6 +88,7 @@ class MainActivity : AppCompatActivity() {
                 else-> showBottomBar()
             }
         }
+
 
     }
 
@@ -177,5 +187,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+
 
 }

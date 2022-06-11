@@ -177,14 +177,16 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_baseline_playlist_play_24"
                 app:tint="@color/startblue"/>
+
             <TextView
-                android:textStyle="bold"
-                android:layout_gravity="center_vertical"
+                android:id="@+id/playlistButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:paddingLeft="20dp"
-                android:text="My playlist"
-                android:textColor="@color/darkBackground"/>
+                android:text="My playlists"
+                android:textColor="@color/darkBackground"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout

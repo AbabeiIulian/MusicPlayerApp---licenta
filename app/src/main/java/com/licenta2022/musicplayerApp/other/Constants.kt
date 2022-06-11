@@ -2,8 +2,6 @@ package com.licenta2022.musicplayerApp.other
 
 object Constants {
 
-    const val SONG_COLLECTION = "songs"
-
     const val DB_USERS = "premium_users"
 
     const val ANDROID_TAG = "AndroidTag"
@@ -17,7 +15,8 @@ object Constants {
     const val NOTIFICATION_CHANNEL_ID="music"
     const val NOTIFICATION_ID=1
 
-    var NEW_USER = false
+    var SONG_COLLECTION = "songs"
 
+    var NEW_USER = false
 
 }
