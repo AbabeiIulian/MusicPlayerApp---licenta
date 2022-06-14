@@ -91,6 +91,9 @@ dependencies {
     // Firebase Firestore
     implementation 'com.google.firebase:firebase-firestore:21.6.0'
 
+    //Firebase Cloud
+    implementation 'com.firebaseui:firebase-ui-firestore:8.0.1'
+
     // Firebase Storage KTX
     implementation 'com.google.firebase:firebase-storage-ktx:19.2.0'
 

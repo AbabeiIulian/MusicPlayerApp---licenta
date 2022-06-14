@@ -3,6 +3,8 @@ package com.licenta2022.musicplayerApp.exoplayer
 import android.content.ComponentName
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.ResultReceiver
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
@@ -51,6 +53,8 @@ class MusicServiceConnection (
     fun unsubscribe(parentId: String, callback: MediaBrowserCompat.SubscriptionCallback) {
         mediaBrowser.unsubscribe(parentId, callback)
     }
+
+
 
     private inner class MediaBrowserConnectionCallback(
         private val context: Context

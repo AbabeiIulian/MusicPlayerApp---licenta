@@ -3,6 +3,7 @@ package com.licenta2022.musicplayerApp
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -32,6 +33,15 @@ class Account_activity : AppCompatActivity() {
         super.onStart()
         checkState()
     }
+
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account)

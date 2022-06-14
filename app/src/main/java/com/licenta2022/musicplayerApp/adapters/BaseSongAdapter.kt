@@ -1,3 +1,4 @@
+
 package com.licenta2022.musicplayerApp.adapters
 
 import android.view.LayoutInflater
@@ -46,6 +47,7 @@ abstract class BaseSongAdapter(
 
 
 
+
     protected var onItemClickListener: ((Song) -> Unit)? = null
 
     fun setItemClickListener(listener: (Song) -> Unit) {
@@ -56,3 +58,5 @@ abstract class BaseSongAdapter(
         return songs.size
     }
 }
+
+

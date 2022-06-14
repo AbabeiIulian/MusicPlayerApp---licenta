@@ -1,37 +1,40 @@
 package com.licenta2022.musicplayerApp.ui
 
-import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.AlarmClock.EXTRA_MESSAGE
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.PopupMenu
-import android.widget.Toast
+import android.widget.SearchView
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.RequestManager
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.material.snackbar.Snackbar
-import com.licenta2022.musicplayerApp.Account_activity
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.licenta2022.musicplayerApp.Loggin_activity
-import com.licenta2022.musicplayerApp.Playlist_activity
 import com.licenta2022.musicplayerApp.R
+import com.licenta2022.musicplayerApp.adapters.SongAdapter
 import com.licenta2022.musicplayerApp.adapters.SwipeSongAdapter
 import com.licenta2022.musicplayerApp.data.entities.Song
 import com.licenta2022.musicplayerApp.exoplayer.isPlaying
 import com.licenta2022.musicplayerApp.exoplayer.toSong
-import com.licenta2022.musicplayerApp.other.Status
+import com.licenta2022.musicplayerApp.other.Constants
 import com.licenta2022.musicplayerApp.other.Status.*
 import com.licenta2022.musicplayerApp.ui.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.list_item.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -39,8 +42,10 @@ class MainActivity : AppCompatActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
 
-    @Inject
     lateinit var swipeSongAdapter: SwipeSongAdapter
+    private lateinit var query : Query
+    private val firestore = FirebaseFirestore.getInstance()
+    private var songs: List<Song>? = null
 
     @Inject
     lateinit var glide: RequestManager
@@ -53,21 +58,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
         subscribeToObservers()
 
-        vpSong.adapter = swipeSongAdapter
+        setupVpSong()
 
-        vpSong.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                if(playbackState?.isPlaying == true){
-                    mainViewModel.playOrToggleSong(swipeSongAdapter.songs[position])
-                }else{
-                    curPlayingSong = swipeSongAdapter.songs[position]
-                }
-            }
-        })
 
         ivPlayPause.setOnClickListener{
             curPlayingSong?.let {
@@ -89,13 +85,60 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_acc, menu)
-        return true
+
+
+    private fun setupVpSong() {
+        val playlistIds = intent.getStringExtra("playlistId")
+
+        if(playlistIds !== null) {
+            query  = firestore.collection(Constants.DB_Playlist).document(playlistIds).collection(
+                Constants.SONG_COLLECTION
+            )
+        } else {
+            query  = firestore
+                .collection(Constants.SONG_COLLECTION)
+        }
+
+
+
+    query.addSnapshotListener { value, error ->
+            if (value !== null) {
+                 songs = value.toObjects(Song::class.java)
+
+                Log.d("AndroidTag2", songs.toString())
+            }
+        }
+
+
+
+
+
+
+        val options: FirestoreRecyclerOptions<Song> = FirestoreRecyclerOptions.Builder<Song>()
+            .setQuery(query, Song::class.java)
+            .build()
+
+        swipeSongAdapter = SwipeSongAdapter(options)
+
+
+
+
+        vpSong.adapter = swipeSongAdapter
+
+        vpSong.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                if(playbackState?.isPlaying == true){
+                    songs?.get(position)?.let { mainViewModel.playOrToggleSong(it) }
+                }else{
+                    curPlayingSong = songs?.get(position)
+                }
+            }
+        })
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.action_fav -> {
@@ -120,10 +163,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun switchViewPagerToCurrentSong(song: Song){
-        val newItemIndex = swipeSongAdapter.songs.indexOf(song)
+        val newItemIndex = songs?.indexOf(song)
 
         if (newItemIndex != -1){
-            vpSong.currentItem = newItemIndex
+            if (newItemIndex != null) {
+                vpSong.currentItem = newItemIndex
+            }
             curPlayingSong = song
         }
 
@@ -135,7 +180,6 @@ class MainActivity : AppCompatActivity() {
                 when(result.status){
                     SUCCESS -> {
                         result.data?.let { songs->
-                            swipeSongAdapter.songs = songs
                             if(songs.isNotEmpty()){
                                 glide.load((curPlayingSong ?: songs[0]).imageUrl).into(ivCurSongImage)
                             }
@@ -186,6 +230,17 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        swipeSongAdapter.startListening()
+        swipeSongAdapter.notifyDataSetChanged()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        swipeSongAdapter.stopListening()
     }
 
 

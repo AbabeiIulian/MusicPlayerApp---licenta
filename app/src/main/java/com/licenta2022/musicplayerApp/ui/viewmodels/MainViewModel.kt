@@ -1,18 +1,19 @@
+
 package com.licenta2022.musicplayerApp.ui.viewmodels
 
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import com.google.firebase.ktx.Firebase
 import com.licenta2022.musicplayerApp.data.entities.Song
-import com.licenta2022.musicplayerApp.exoplayer.MusicServiceConnection
-import com.licenta2022.musicplayerApp.exoplayer.isPlayEnabled
-import com.licenta2022.musicplayerApp.exoplayer.isPlaying
-import com.licenta2022.musicplayerApp.exoplayer.isPrepared
+import com.licenta2022.musicplayerApp.data.remote.MusicDatabase
+import com.licenta2022.musicplayerApp.exoplayer.*
 import com.licenta2022.musicplayerApp.other.Constants.MEDIA_ROOT_ID
 import com.licenta2022.musicplayerApp.other.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,6 +25,8 @@ class MainViewModel @Inject constructor(
 
     val isConnected = musicServiceConnection.isConnected
     val networkError = musicServiceConnection.networkError
+
+
     val curPlayingSong = musicServiceConnection.curPlayingSong
     val playbackState = musicServiceConnection.playbackstate
 
@@ -82,5 +85,8 @@ class MainViewModel @Inject constructor(
         super.onCleared()
         musicServiceConnection.unsubscribe(MEDIA_ROOT_ID, object : MediaBrowserCompat.SubscriptionCallback(){})
     }
+
+
+
 
 }

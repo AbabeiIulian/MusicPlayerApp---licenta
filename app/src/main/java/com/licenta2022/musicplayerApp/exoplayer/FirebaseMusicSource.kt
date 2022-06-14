@@ -1,3 +1,4 @@
+
 package com.licenta2022.musicplayerApp.exoplayer
 
 import android.support.v4.media.MediaBrowserCompat
@@ -5,27 +6,32 @@ import android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
+import android.util.Log
 import androidx.core.net.toUri
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.licenta2022.musicplayerApp.data.entities.Song
 import com.licenta2022.musicplayerApp.data.remote.MusicDatabase
 import com.licenta2022.musicplayerApp.exoplayer.State.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class FirebaseMusicSource @Inject constructor(
-    private val musicDatabase: MusicDatabase
+    private val musicDatabase: MusicDatabase,
 ){
 
 
     var songs = emptyList<MediaMetadataCompat>()
 
-    suspend fun fetchMediaData() = withContext(Dispatchers.IO){
+    suspend fun fetchMediaData(playListId: String?) = withContext(Dispatchers.IO){
         state = STATE_INITIALIZING
 
-        val allSongs = musicDatabase.getSongsByPlaylist()
+        Log.d("AndroidTagFbMusicS", playlistId.toString())
+        val allSongs = musicDatabase.getSongsByPlaylist(playListId) //home x sau a dat click pe playlist
         songs = allSongs.map { song ->
             MediaMetadataCompat.Builder()
                 .putString(METADATA_KEY_ARTIST, song.subtitle)
@@ -37,7 +43,6 @@ class FirebaseMusicSource @Inject constructor(
                 .putString(METADATA_KEY_ALBUM_ART_URI, song.imageUrl)
                 .putString(METADATA_KEY_DISPLAY_SUBTITLE, song.subtitle)
                 .putString(METADATA_KEY_DISPLAY_DESCRIPTION, song.subtitle)
-                .putString(METADATA_KEY_GENRE, song.songGenre)
                 .build()
         }
         state = STATE_INITIALIZED
@@ -95,7 +100,20 @@ class FirebaseMusicSource @Inject constructor(
             return true
         }
     }
+
+    fun getSongsByPlaylistId(playListId: String?) = flow {
+        try {
+           val songs = musicDatabase.getSongsByPlaylist(playlistId)
+            emit(songs)
+        } catch (e: Error) {
+            emit(e.message)
+        }
+    }
+
+    
+
 }
+
 
 enum class   State{
     STATE_CREATED,
@@ -103,3 +121,5 @@ enum class   State{
     STATE_INITIALIZED,
     STATE_ERROR
 }
+
+

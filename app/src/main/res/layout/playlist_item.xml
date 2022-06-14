@@ -10,9 +10,24 @@
 
     <TextView
         android:id="@+id/playlistNameTextView"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
         android:text="Playlist 1"
         android:textSize="24dp"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:gravity="center|left"
+        app:layout_constraintEnd_toStartOf="@+id/removeFromPlaylist"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <ImageButton
+        android:id="@+id/removeFromPlaylist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_remove"
+        />
+
+
 </LinearLayout>

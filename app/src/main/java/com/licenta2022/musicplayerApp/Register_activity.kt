@@ -63,6 +63,7 @@ class Register_activity : AppCompatActivity() {
                 NEW_USER = true
                 val intent = Intent(this, Account_activity::class.java)
                 startActivity(intent)
+                finish()
             //}
         }
     }

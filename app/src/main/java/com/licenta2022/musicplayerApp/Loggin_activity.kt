@@ -27,6 +27,7 @@ class Loggin_activity : AppCompatActivity() {
         btnHome1.setOnClickListener{
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
+            finish()
         }
 
         btnLogin.setOnClickListener{
@@ -71,6 +72,7 @@ class Loggin_activity : AppCompatActivity() {
             //btnRegister2.setOnClickListener(){
             val intent = Intent(this, Account_activity::class.java)
             startActivity(intent)
+            finish()
             //}
         }
     }
